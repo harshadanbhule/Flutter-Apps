@@ -1,11 +1,16 @@
+import 'dart:developer';
+
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-//port 'package:flutter/widgets.dart';
 import 'package:flutter_svg/svg.dart';
 // ignore: depend_on_referenced_packages
 import 'package:google_fonts/google_fonts.dart';
-//import 'home.dart';
-import 'login.dart';
+import 'package:rento/login.dart';
+import 'package:rento/widget/snackbar.dart';
+
+
+
 
 class Register extends StatefulWidget {
   const Register({super.key});
@@ -15,16 +20,24 @@ class Register extends StatefulWidget {
 }
 
 class _RegisterState extends State<Register> {
-  TextEditingController usenameController = TextEditingController();
-  TextEditingController passwordController = TextEditingController();
-
-  final GlobalKey<FormState> _loginKey = GlobalKey<FormState>();
-
- // bool _loggedin = false;
-  bool isPassVisible = false;
+  void loginNavigator() => Navigator.pushReplacement(
+      context, MaterialPageRoute(builder: (_) => const Login()));
+ 
+  bool isCheckBox = false;
+  final TextEditingController _emailTextEditingController =
+      TextEditingController();
+  final TextEditingController _passwordTextEditingController =
+      TextEditingController();
+      final TextEditingController _usernameTextEditingController =
+      TextEditingController();
+  final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
+  bool isVisiblePass = true;
+  bool isVisibleConfirmPass = true;
+  
 
   @override
   Widget build(BuildContext context) {
+ 
     return Scaffold(
       resizeToAvoidBottomInset: false,
       backgroundColor: Colors.white,
@@ -39,7 +52,7 @@ class _RegisterState extends State<Register> {
       ),
       body: Center(
         child: Form(
-          key: _loginKey,
+          
           child: Column(
             children: [
               const SizedBox(
@@ -73,12 +86,12 @@ class _RegisterState extends State<Register> {
                 height: 64,
                 width: 357,
                 child: TextFormField(
-                  controller: usenameController,
+                  controller:_usernameTextEditingController,
                   cursorColor: const Color.fromRGBO(221, 18, 18, 1),
                   decoration: const InputDecoration(
                       filled: true,
                       fillColor: Color.fromRGBO(241, 244, 255, 1),
-                      hintText: "Email",
+                      hintText: "UserName",
                       focusedBorder: OutlineInputBorder(
                         borderSide: BorderSide(
                           width: 2,
@@ -99,7 +112,7 @@ class _RegisterState extends State<Register> {
                   validator: (value) {
                     //  print("IN USERNAME VALIDATOR");
                     if (value == null || value.isEmpty) {
-                      return "Please enter Email";
+                      return "Please enter UserName";
                     } else {
                       return null;
                     }
@@ -114,10 +127,49 @@ class _RegisterState extends State<Register> {
                 height: 64,
                 width: 357,
                 child: TextFormField(
-                  controller: passwordController,
-                  obscureText: isPassVisible ? false : true,
+                  controller: _emailTextEditingController,
+                  
+                  //key: passwordKey,
+                  decoration: const InputDecoration(
+                    filled: true,
+                    fillColor: Color.fromRGBO(241, 244, 255, 1),
+                    hintText: "Email",
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        width: 2,
+                        color: Color.fromRGBO(221, 18, 18, 1),
+                      ),
+                      borderRadius: BorderRadius.all(Radius.circular(10)),
+                    ),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(10)),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        width: 2,
+                        color: Color.fromRGBO(255, 255, 255, 1),
+                      ),
+                      borderRadius: BorderRadius.all(Radius.circular(10)),
+                    ),
+                   
+                  ),
+                  
+                ),
+              ),
+              const SizedBox(
+                height: 20,
+              ),
+              SizedBox(
+                height: 64,
+                width: 357,
+                child: TextFormField(
+                  
+                  controller: _passwordTextEditingController,
+                  
+                          obscureText: isVisiblePass,
                   //key: passwordKey,
                   decoration: InputDecoration(
+                    
                     filled: true,
                     fillColor: const Color.fromRGBO(241, 244, 255, 1),
                     hintText: "Password",
@@ -138,75 +190,17 @@ class _RegisterState extends State<Register> {
                       ),
                       borderRadius: BorderRadius.all(Radius.circular(10)),
                     ),
-                    suffixIcon: GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          isPassVisible = !isPassVisible;
-                        });
-                      },
-                      child: Icon(
-                        size: 20,
-                        CupertinoIcons.eye,
-                        color: isPassVisible
-                            ? const Color.fromRGBO(221, 18, 18, 1)
-                            : const Color.fromARGB(255, 134, 134, 134),
-                      ),
-                    ),
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return "Please enter Password";
-                    } else {
-                      return null;
-                    }
-                  },
-                ),
-              ),
-              const SizedBox(
-                height: 20,
-              ),
-              SizedBox(
-                height: 64,
-                width: 357,
-                child: TextFormField(
-                  controller: passwordController,
-                  obscureText: isPassVisible ? false : true,
-                  //key: passwordKey,
-                  decoration: InputDecoration(
-                    filled: true,
-                    fillColor: const Color.fromRGBO(241, 244, 255, 1),
-                    hintText: "Confirm Password",
-                    focusedBorder: const OutlineInputBorder(
-                      borderSide: BorderSide(
-                        width: 2,
-                        color: Color.fromRGBO(221, 18, 18, 1),
-                      ),
-                      borderRadius: BorderRadius.all(Radius.circular(10)),
-                    ),
-                    border: const OutlineInputBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(10)),
-                    ),
-                    enabledBorder: const OutlineInputBorder(
-                      borderSide: BorderSide(
-                        width: 2,
-                        color: Color.fromRGBO(255, 255, 255, 1),
-                      ),
-                      borderRadius: BorderRadius.all(Radius.circular(10)),
-                    ),
-                    suffixIcon: GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          isPassVisible = !isPassVisible;
-                        });
-                      },
-                      child: Icon(
-                        size: 20,
-                        CupertinoIcons.eye,
-                        color: isPassVisible
-                            ? const Color.fromRGBO(221, 18, 18, 1)
-                            : const Color.fromARGB(255, 134, 134, 134),
-                      ),
-                    ),
+                    suffixIcon: IconButton(
+        icon: Icon(
+          isVisiblePass ? CupertinoIcons.eye_slash : CupertinoIcons.eye,
+          color: Colors.grey,
+        ),
+        onPressed: () {
+          setState(() {
+            isVisiblePass = !isVisiblePass; // Toggle password visibility
+          });
+        },
+                    )           
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -228,17 +222,49 @@ class _RegisterState extends State<Register> {
                     elevation: 10,
                     shadowColor: const Color.fromRGBO(203, 214, 255, 1),
                     foregroundColor: const Color.fromARGB(255, 255, 255, 255),
-                    backgroundColor: const Color.fromRGBO(221, 18, 18, 1),
+                    backgroundColor:const Color.fromRGBO(221, 18, 18, 1),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
                   ),
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => const Login()),
-                    );
-                  },
+                  onPressed: () async {
+                        if (_emailTextEditingController.text
+                                .trim()
+                                .isNotEmpty &&
+                            _passwordTextEditingController.text
+                                .trim()
+                                .isNotEmpty) {
+                          try {
+                            UserCredential userCredential = await _firebaseAuth
+                                .createUserWithEmailAndPassword(
+                                    email:
+                                        _emailTextEditingController.text.trim(),
+                                    password: _passwordTextEditingController
+                                        .text
+                                        .trim());
+                            log("User Credential : $userCredential");
+                            CustomSnackBar.showCustomSnackbar(
+                              message: "User Register Successfully",
+                              context: context,
+                            );
+                            Navigator.of(context).pushReplacement(
+                                MaterialPageRoute(
+                                    builder: (context) => const Login()));
+                          } on FirebaseAuthException catch (error) {
+                            print("${error.code}");
+                            print("${error.message}");
+                            CustomSnackBar.showCustomSnackbar(
+                              message: error.message!,
+                              context: context,
+                            );
+                          }
+                        } else {
+                          CustomSnackBar.showCustomSnackbar(
+                            message: "Please enter valid fields",
+                            context: context,
+                          );
+                        }
+                      },
                   child: Text(
                     "Sign up",
                     style: GoogleFonts.poppins(
@@ -253,6 +279,7 @@ class _RegisterState extends State<Register> {
                 height: 40,
               ),
               GestureDetector(
+                
                 onTap: (){
                   Navigator.push(
                       context,
@@ -287,7 +314,7 @@ class _RegisterState extends State<Register> {
                   const Spacer(),
                   GestureDetector(
                     onTap: () {
-                      //print('Container tapped!');
+                      print('Container tapped!');
                     },
                     child: Container(
                       width: 60,

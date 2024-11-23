@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 // ignore: depend_on_referenced_packages
 import 'package:google_fonts/google_fonts.dart';
+import 'package:rento/cart.dart';
 //import 'login.dart';
 //import 'package:flutter_svg/flutter_svg.dart';
 import 'inventory.dart';
@@ -32,8 +33,8 @@ class _HomePageState extends State<HomePage> {
         colors: [
           Color.fromRGBO(221, 18, 18, 1),
           Color.fromRGBO(221, 18, 18, 1),
-       Colors.transparent,
-         Colors.transparent,
+          Colors.transparent,
+          Colors.transparent,
         ],
         stops: [0.0, 0.54, 0.54, 1.0],
       );
@@ -51,7 +52,6 @@ class _HomePageState extends State<HomePage> {
           style: GoogleFonts.barlowCondensed(
             color: Colors.black,
             fontSize: 24,
-           
           ),
         ),
       );
@@ -64,7 +64,6 @@ class _HomePageState extends State<HomePage> {
           style: GoogleFonts.barlowCondensed(
             color: Colors.black,
             fontSize: 24,
-            
           ),
         ),
       );
@@ -189,14 +188,18 @@ class _HomePageState extends State<HomePage> {
                 children: [
                   IconButton(
                     icon: const Icon(CupertinoIcons.bars),
-                    onPressed: () {
-                     
-                    },
+                    onPressed: () {},
                   ),
                   Row(
                     children: [
                       GestureDetector(
-                        onTap: () {},
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const Cart()),
+                          );
+                        },
                         child: const Padding(
                           padding: EdgeInsets.only(left: 8),
                           child: Icon(CupertinoIcons.shopping_cart),
@@ -249,11 +252,11 @@ class _HomePageState extends State<HomePage> {
           // ),
           // Wrapped the TextField with a Container and applied shadow
           Container(
+            width: 316,
+            height: 45,
             margin: const EdgeInsets.symmetric(horizontal: 15),
             decoration: BoxDecoration(
-              borderRadius: const BorderRadius.all(
-                Radius.circular(30)
-              ),
+              borderRadius: const BorderRadius.all(Radius.circular(18)),
               boxShadow: [
                 BoxShadow(
                   color: Colors.grey.withOpacity(0.5),
@@ -263,15 +266,22 @@ class _HomePageState extends State<HomePage> {
                 ),
               ],
             ),
-            child: TextField(
-              decoration: InputDecoration(
-                border: OutlineInputBorder(
-                  borderSide: BorderSide.none,
-                  borderRadius: BorderRadius.circular(30),
+            child: SizedBox(
+              width: 316,
+              height: 45,
+              child: TextField(
+                decoration: InputDecoration(
+                  suffixIcon: const Icon(
+                    Icons.search,
+                  ),
+                  border: OutlineInputBorder(
+                    borderSide: BorderSide.none,
+                    borderRadius: BorderRadius.circular(18),
+                  ),
+                  fillColor: Colors.white,
+                  filled: true,
+                  hintText: "  Find Bicycles, Accessories",
                 ),
-                fillColor: Colors.white,
-                filled: true,
-                hintText: "  Find Bicycles, Accessories",
               ),
             ),
           ),

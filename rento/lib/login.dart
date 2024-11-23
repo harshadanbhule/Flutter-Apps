@@ -1,9 +1,18 @@
+import 'dart:developer';
+
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 // ignore: depend_on_referenced_packages
 import 'package:google_fonts/google_fonts.dart';
-import 'home.dart';
+import 'package:rento/home.dart';
+import 'package:rento/register.dart';
+import 'package:rento/widget/custom_checkbox.dart';
+import 'package:rento/widget/snackbar.dart';
+
+
+
 
 class Login extends StatefulWidget {
   const Login({super.key});
@@ -12,45 +21,22 @@ class Login extends StatefulWidget {
   State<Login> createState() => _LoginState();
 }
 
-class User {
-  final String user;
-  final String pass;
-
-  const User({required this.user, required this.pass});
-}
 
 class _LoginState extends State<Login> {
-  List<User> userList = [
-    const User(user: "1", pass: "1"),
-    const User(user: "harshad@gmail.com", pass: "Harshad123"),
-    const User(user: "aditya@gmail.com", pass: "Aditya123"),
-    const User(user: "pranav@gmail.com", pass: "Pranav123"),
-  ];
+final TextEditingController _emailTextEditingController =
+      TextEditingController();
+  final TextEditingController _passwordTextEditingController =
+      TextEditingController();
+  final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
+  bool isVisible = true;
+  bool isCheckBox=false;
 
-  TextEditingController usenameController = TextEditingController();
-  TextEditingController passwordController = TextEditingController();
-
-  final GlobalKey<FormState> _loginKey = GlobalKey<FormState>();
-
-  bool _loggedin = false;
-  bool isPassVisible = false;
-
-  // ignore: non_constant_identifier_names
-  void ShowNextPage() {
-    if (_loggedin) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => const HomePage(),
-        ),
-      );
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
+    
     return Scaffold(
-     resizeToAvoidBottomInset: false,
+      resizeToAvoidBottomInset: false,
       backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.white,
@@ -61,9 +47,8 @@ class _LoginState extends State<Login> {
           },
         ),
       ),
-      body: Center(
+      body:Center(
         child: Form(
-          key: _loginKey,
           child: Column(
             children: [
               const SizedBox(
@@ -97,7 +82,7 @@ class _LoginState extends State<Login> {
                 height: 64,
                 width: 357,
                 child: TextFormField(
-                  controller: usenameController,
+                  controller:  _emailTextEditingController,
                   cursorColor: const Color.fromRGBO(221, 18, 18, 1),
                   decoration: const InputDecoration(
                       filled: true,
@@ -113,6 +98,7 @@ class _LoginState extends State<Login> {
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.all(Radius.circular(10)),
                       ),
+                      
                       enabledBorder: OutlineInputBorder(
                         borderSide: BorderSide(
                           width: 2,
@@ -138,10 +124,13 @@ class _LoginState extends State<Login> {
                 height: 64,
                 width: 357,
                 child: TextFormField(
-                  controller: passwordController,
-                  obscureText: isPassVisible ? false : true,
+                  
+                  controller: _passwordTextEditingController,
+                  
+                          obscureText: isVisible,
                   //key: passwordKey,
                   decoration: InputDecoration(
+                    
                     filled: true,
                     fillColor: const Color.fromRGBO(241, 244, 255, 1),
                     hintText: "Password",
@@ -162,20 +151,17 @@ class _LoginState extends State<Login> {
                       ),
                       borderRadius: BorderRadius.all(Radius.circular(10)),
                     ),
-                    suffixIcon: GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          isPassVisible = !isPassVisible;
-                        });
-                      },
-                      child: Icon(
-                        size: 20,
-                        CupertinoIcons.eye,
-                        color: isPassVisible
-                            ? const Color.fromRGBO(221, 18, 18, 1)
-                            : const Color.fromARGB(255, 134, 134, 134),
-                      ),
-                    ),
+                    suffixIcon: IconButton(
+        icon: Icon(
+          isVisible ? CupertinoIcons.eye_slash : CupertinoIcons.eye,
+          color: Colors.grey,
+        ),
+        onPressed: () {
+          setState(() {
+            isVisible = !isVisible; // Toggle password visibility
+          });
+        },
+                    )           
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -191,7 +177,20 @@ class _LoginState extends State<Login> {
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
+                
                 children: [
+                  const SizedBox(
+                    width: 30,
+                  ),
+                  CustomCheckbox(
+                            value: isCheckBox,
+                            onChanged: (val) {
+                              setState(() {
+                                isCheckBox = !isCheckBox;
+                              });
+                            },
+                          ),
+                          const Spacer(),
                   Text(
                     "Forgot your password?",
                     textAlign: TextAlign.center,
@@ -222,29 +221,41 @@ class _LoginState extends State<Login> {
                       borderRadius: BorderRadius.circular(10),
                     ),
                   ),
-                  onPressed: () {
-                    bool loginValidated = _loginKey.currentState!.validate();
-                    if (loginValidated &&
-                        userList.any(
-                          (element) =>
-                              element.user == usenameController.text &&
-                              element.pass == passwordController.text,
-                        )) {
-                      _loggedin = true;
-                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                        content: Text("Login SuccessFul"),
-                        backgroundColor: Colors.green,
-                      ));
-                      ShowNextPage();
-                    } else {
-                      _loggedin = false;
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                            content: Text("Invalid Credentials , Try Again!"),
-                            backgroundColor: Colors.red),
-                      );
-                    }
-                  },
+                  onPressed: () async {
+                        if (_emailTextEditingController.text
+                                .trim()
+                                .isNotEmpty &&
+                            _passwordTextEditingController.text
+                                .trim()
+                                .isNotEmpty) {
+                          try {
+                            UserCredential userCredential =
+                                await _firebaseAuth.signInWithEmailAndPassword(
+                                    email: _emailTextEditingController.text,
+                                    password:
+                                        _passwordTextEditingController.text);
+                            log(userCredential.user!.email!);
+                            _emailTextEditingController.clear();
+                            _passwordTextEditingController.clear();
+
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const HomePage(),
+                              ),
+                            );
+                          } on FirebaseAuthException catch (error) {
+                            log("B2B: error code: ${error.code}");
+                            log("B2B: error message: ${error.message}");
+                            CustomSnackBar.showCustomSnackbar(
+                              message: error.code,
+                              // ignore: use_build_context_synchronously
+                              context: context,
+                            );
+                          }
+                        }
+                      },
+                  
                   child: Text(
                     "Sign in",
                     style: GoogleFonts.poppins(
@@ -258,12 +269,20 @@ class _LoginState extends State<Login> {
               const SizedBox(
                 height: 40,
               ),
-              Text(
-                "Create new account",
-                style: GoogleFonts.poppins(
-                  fontWeight: FontWeight.w600,
-                  fontSize: 14,
-                  color: const Color.fromRGBO(73, 73, 73, 1),
+              GestureDetector(
+                onTap:(){
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const Register()),
+                    );
+                },
+                child: Text(
+                  "Create new account",
+                  style: GoogleFonts.poppins(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 14,
+                    color: const Color.fromRGBO(73, 73, 73, 1),
+                  ),
                 ),
               ),
               const SizedBox(
@@ -295,14 +314,15 @@ class _LoginState extends State<Login> {
                           borderRadius: BorderRadius.all(Radius.circular(10))),
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
-                        child:
-                            SvgPicture.asset("assets/images/login/google.svg"),
+                        child: SvgPicture.asset(
+                          "assets/images/login/google.svg"
+                        ),
                       ),
                     ),
                   ),
                   const SizedBox(
-                    width: 15,
-                  ),
+                width: 15,
+              ),
                   GestureDetector(
                     onTap: () {
                       print('Container tapped!');
@@ -316,13 +336,14 @@ class _LoginState extends State<Login> {
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: SvgPicture.asset(
-                            "assets/images/login/facebook.svg"),
+                          "assets/images/login/facebook.svg"
+                        ),
                       ),
                     ),
                   ),
                   const SizedBox(
-                    width: 15,
-                  ),
+                width: 15,
+              ),
                   GestureDetector(
                     onTap: () {
                       print('Container tapped!');
@@ -335,8 +356,9 @@ class _LoginState extends State<Login> {
                           borderRadius: BorderRadius.all(Radius.circular(10))),
                       child: Padding(
                         padding: const EdgeInsets.all(8),
-                        child:
-                            SvgPicture.asset("assets/images/login/apple.svg"),
+                        child: SvgPicture.asset(
+                          "assets/images/login/apple.svg"
+                        ),
                       ),
                     ),
                   ),

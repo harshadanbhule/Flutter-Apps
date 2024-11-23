@@ -102,7 +102,13 @@ class _ProductState extends State<Product> {
                 Row(
                   children: [
                     GestureDetector(
-                      onTap: () {},
+                      onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const Cart()),
+                          );
+                        },
                       child: const Padding(
                         padding: EdgeInsets.all(8.0),
                         child: Icon(CupertinoIcons.shopping_cart),
