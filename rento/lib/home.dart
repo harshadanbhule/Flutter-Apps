@@ -1,22 +1,22 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-// ignore: depend_on_referenced_packages
 import 'package:google_fonts/google_fonts.dart';
 import 'package:rento/cart.dart';
-//import 'login.dart';
-//import 'package:flutter_svg/flutter_svg.dart';
 import 'inventory.dart';
 import 'product.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
+
   @override
-  // ignore: library_private_types_in_public_api
   _HomePageState createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
-  // Function to return Gradient Colour in Inventory
+
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  bool isHovered = false;
+
   LinearGradient inventoryColor(int index) {
     if (index % 2 == 0) {
       return const LinearGradient(
@@ -41,7 +41,7 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  // function for positioning text
+  // Function for positioning text
   Positioned textPosition(int index) {
     if (index % 2 == 1) {
       return Positioned(
@@ -71,7 +71,6 @@ class _HomePageState extends State<HomePage> {
   }
 
   // Function for Button Position
-
   Positioned buttonPosition(int i) {
     if (i % 2 == 1) {
       return Positioned(
@@ -125,7 +124,6 @@ class _HomePageState extends State<HomePage> {
                 right: BorderSide.none,
               ),
             ),
-            //color: Colors.black,
             height: 30,
             width: 100,
             child: Center(
@@ -150,7 +148,6 @@ class _HomePageState extends State<HomePage> {
           inventory[i].cycleImage,
           width: 320,
           height: 168,
-          // You might need to adjust fit based on your SVG aspect ratio
           fit: BoxFit.contain,
         ),
       );
@@ -162,7 +159,6 @@ class _HomePageState extends State<HomePage> {
           inventory[i].cycleImage,
           width: 295,
           height: 168,
-          // You might need to adjust fit based on your SVG aspect ratio
           fit: BoxFit.contain,
         ),
       );
@@ -172,23 +168,115 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-      resizeToAvoidBottomInset: false,
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding:
-                const EdgeInsets.only(left: 7, top: 40, right: 20, bottom: 10),
-            child: Container(
-              color: Colors.white,
-              //  padding: const EdgeInsets.only(left: 7, top: 30, right: 20),
+        key: _scaffoldKey,
+        backgroundColor: Colors.white,
+        drawer: Drawer(
+          child: ListView(
+            children: [
+              DrawerHeader(
+                decoration: const BoxDecoration(
+                  color: Color.fromRGBO(221, 18, 18, 1),
+                ),
+                child: Column(
+                  children: [
+                    Row(
+                      children: [
+                        Text(
+                          "Rento",
+                          style: GoogleFonts.roboto(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                        const Spacer()
+                      ],
+                    ),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    Row(
+                      children: [
+                        SizedBox(
+                            height: 80,
+                            width: 80,
+                            child:
+                                Image.asset("assets/images/enter/profile.png")),
+                        const SizedBox(
+                          width: 20,
+                        ),
+                        Column(
+                          children: [
+                            Text(
+                              "harshadanbhule",
+                              style: GoogleFonts.roboto(
+                                fontSize: 21,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.white,
+                              ),
+                            ),
+                            Text(
+                              "harshad@gmail.com",
+                              style: GoogleFonts.roboto(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ],
+                        )
+                      ],
+                    )
+                  ],
+                ),
+              ),
+              ListTile(
+                tileColor: isHovered ? Colors.grey[300] : Colors.transparent, 
+                leading: const Icon(CupertinoIcons.person),
+                title: const Text("Profile"),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const Product()),
+                  );
+                },
+                
+              ),
+              ListTile(
+                leading: const Icon(CupertinoIcons.home),
+                title: const Text("Home"),
+                onTap: () {
+                  Navigator.pop(context); // Close the drawer
+                },
+              ),
+              ListTile(
+                leading: const Icon(CupertinoIcons.shopping_cart),
+                title: const Text("Cart"),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const Cart()),
+                  );
+                },
+              ),
+            ],
+          ),
+        ),
+        resizeToAvoidBottomInset: false,
+        body: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(
+                  left: 7, top: 40, right: 20, bottom: 10),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   IconButton(
                     icon: const Icon(CupertinoIcons.bars),
-                    onPressed: () {},
+                    onPressed: () {
+                      _scaffoldKey.currentState?.openDrawer();
+                    },
                   ),
                   Row(
                     children: [
@@ -200,114 +288,107 @@ class _HomePageState extends State<HomePage> {
                                 builder: (context) => const Cart()),
                           );
                         },
-                        child: const Padding(
-                          padding: EdgeInsets.only(left: 8),
-                          child: Icon(CupertinoIcons.shopping_cart),
-                        ),
+                        child: const Icon(CupertinoIcons.shopping_cart),
                       ),
-                      GestureDetector(
-                        onTap: () {},
-                        child: const Padding(
-                          padding: EdgeInsets.only(left: 8),
-                          child: Icon(CupertinoIcons.person),
-                        ),
-                      ),
+                      const SizedBox(width: 10),
+                      const Icon(CupertinoIcons.person),
                     ],
                   ),
                 ],
               ),
             ),
-          ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(left: 25),
-                child: Text(
-                  "Find Your Favorite",
-                  style: GoogleFonts.roboto(
-                    fontWeight: FontWeight.w700,
-                    fontSize: 24,
+            // Additional UI for HomePage
+            const SizedBox(height: 20),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(left: 25),
+                  child: Text(
+                    "Find Your Favorite",
+                    style: GoogleFonts.roboto(
+                      fontWeight: FontWeight.w700,
+                      fontSize: 24,
+                    ),
                   ),
                 ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(left: 25),
-                child: Text(
-                  "Bicycle!",
-                  style: GoogleFonts.roboto(
-                    fontWeight: FontWeight.w700,
-                    fontSize: 24,
+                Padding(
+                  padding: const EdgeInsets.only(left: 25),
+                  child: Text(
+                    "Bicycle!",
+                    style: GoogleFonts.roboto(
+                      fontWeight: FontWeight.w700,
+                      fontSize: 24,
+                    ),
                   ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(
-            height: 18,
-          ),
-          // Added SizedBox to provide spacing between widgets
-          // const SizedBox(
-          //   height: 20,
-          // ),
-          // Wrapped the TextField with a Container and applied shadow
-          Container(
-            width: 316,
-            height: 45,
-            margin: const EdgeInsets.symmetric(horizontal: 15),
-            decoration: BoxDecoration(
-              borderRadius: const BorderRadius.all(Radius.circular(18)),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.grey.withOpacity(0.5),
-                  spreadRadius: 1.5,
-                  blurRadius: 7,
-                  offset: const Offset(5, 10),
                 ),
               ],
             ),
-            child: SizedBox(
+            const SizedBox(
+              height: 18,
+            ),
+            // Added SizedBox to provide spacing between widgets
+            // const SizedBox(
+            //   height: 20,
+            // ),
+            // Wrapped the TextField with a Container and applied shadow
+            Container(
               width: 316,
               height: 45,
-              child: TextField(
-                decoration: InputDecoration(
-                  suffixIcon: const Icon(
-                    Icons.search,
+              margin: const EdgeInsets.symmetric(horizontal: 15),
+              decoration: BoxDecoration(
+                borderRadius: const BorderRadius.all(Radius.circular(18)),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.5),
+                    spreadRadius: 1.5,
+                    blurRadius: 7,
+                    offset: const Offset(5, 10),
                   ),
-                  border: OutlineInputBorder(
-                    borderSide: BorderSide.none,
-                    borderRadius: BorderRadius.circular(18),
+                ],
+              ),
+              child: SizedBox(
+                width: 316,
+                height: 45,
+                child: TextField(
+                  decoration: InputDecoration(
+                    suffixIcon: const Icon(
+                      Icons.search,
+                    ),
+                    border: OutlineInputBorder(
+                      borderSide: BorderSide.none,
+                      borderRadius: BorderRadius.circular(18),
+                    ),
+                    fillColor: Colors.white,
+                    filled: true,
+                    hintText: "  Find Bicycles, Accessories",
                   ),
-                  fillColor: Colors.white,
-                  filled: true,
-                  hintText: "  Find Bicycles, Accessories",
                 ),
               ),
             ),
-          ),
-          // Wrapped ListView.builder with a SizedBox to provide finite height
-          Expanded(
-            child: ListView.builder(
-              itemCount: inventory.length,
-              itemBuilder: (context, index) {
-                return Stack(
-                  children: [
-                    Container(
-                      height: 185.7,
-                      decoration: BoxDecoration(
-                        gradient: inventoryColor(index),
+
+            // Wrapped ListView.builder with a SizedBox to provide finite height
+            Expanded(
+              child: ListView.builder(
+                itemCount: inventory.length,
+                itemBuilder: (context, index) {
+                  return Stack(
+                    children: [
+                      Container(
+                        height: 185.7,
+                        decoration: BoxDecoration(
+                          gradient: inventoryColor(index),
+                        ),
                       ),
-                    ),
-                    textPosition(index),
-                    imagePosition(index),
-                    buttonPosition(index),
-                  ],
-                );
-              },
+                      textPosition(index),
+                      imagePosition(index),
+                      buttonPosition(index),
+                    ],
+                  );
+                },
+              ),
             ),
-          ),
-        ],
-      ),
-    );
+          ],
+        ));
   }
 }
